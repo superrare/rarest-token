@@ -4,11 +4,11 @@ async function main() {
   const [deployer] = await ethers.getSigners();
 
   const newToken = await ethers.getContractFactory("SuperRareToken");
-  const upgradedToken = await upgrades.upgradeProxy('0xcb35043Ca7742773F543BDFc4BB5e0b350018C49', newToken);
+  const upgradedToken = await upgrades.upgradeProxy('0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0', newToken);
 
   await upgradedToken.deployed();
 
-  console.log("Updated token impl")
+  console.log("Updated token impl at address: ", upgradedToken.address);
 }
 
 main()

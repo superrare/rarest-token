@@ -39,7 +39,7 @@ contract SuperRareToken is InitializableV2,
         // ERC20PausableUpgradeable.initialize(owner);
 
         // Initialize call makes token mintable & gives minterRole to msg.sender
-        __ERC20PresetMinterPauser_init(NAME, SYMBOL);
+        ERC20PresetMinterPauserUpgradeable.initialize(NAME, SYMBOL);
 
         // Mints initial token supply & transfers to _owner account
         _mint(_owner, INITIAL_SUPPLY);

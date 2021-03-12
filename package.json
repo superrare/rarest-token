@@ -23,6 +23,7 @@
     "@openzeppelin/contracts": "^3.4.1-solc-0.7-2",
     "@openzeppelin/contracts-upgradeable": "^3.4.1-solc-0.7-2",
     "@openzeppelin/hardhat-upgrades": "^1.6.0",
+    "@openzeppelin/test-helpers": "^0.5.10",
     "chai": "^4.3.3",
     "ethereum-waffle": "^3.3.0",
     "ethers": "^5.0.32",
