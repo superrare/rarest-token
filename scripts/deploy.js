@@ -7,15 +7,14 @@ async function main() {
     "Deploying contracts with the account:",
     deployer.address
   );
-  
-  console.log("Account balance:", (await deployer.getBalance()).toString());
 
   const Token = await ethers.getContractFactory("SuperRareToken");
 
-  // console.log(Token.interface);
-  console.log(typeof('0xd5a498bbc6d21e4e1cdbb8fec58e3ecd7124fb43'))
-
   const proxy = await upgrades.deployProxy(Token, ['0xd5a498bbc6d21e4e1cdbb8fec58e3ecd7124fb43'], {initializer: 'init'});
+  // const ProxyContractFactory = await ethers.getContractFactory("SuperRareTokenProxy");
+  
+  // const token = await ethers.
+
 
   await proxy.deployed();
 

@@ -3,12 +3,12 @@ const { expect } = require('chai');
 const { ethers } = require("hardhat");
 const { expectRevert } = require('@openzeppelin/test-helpers');
 
-describe('SuperRareToken', function() {
-  before(async function() {
+describe('SuperRareToken', function () {
+  before(async function () {
     this.SuperRareToken = await ethers.getContractFactory('SuperRareToken');
   });
 
-  beforeEach(async function() {
+  beforeEach(async function () {
     const [owner] = await ethers.getSigners();
 
     this.superRareToken = await this.SuperRareToken.deploy();
@@ -16,13 +16,13 @@ describe('SuperRareToken', function() {
     await this.superRareToken.init(owner.address);
   });
 
-  it('Token Properties Setup Correctly', async function() {
+  it('Token Properties Setup Correctly', async function () {
     expect((await this.superRareToken.symbol())).to.equal('SR');
     expect((await this.superRareToken.name())).to.equal('SuperRare');
     expect((await this.superRareToken.totalSupply())).to.equal('1000000000000000000000000');
   });
 
-  it('Token Roles Setup Correctly', async function() {
+  it('Token Roles Setup Correctly', async function () {
     const [owner, addr1] = await ethers.getSigners();
     const adminRole = await this.superRareToken.DEFAULT_ADMIN_ROLE();
     const minterRole = await this.superRareToken.MINTER_ROLE();
@@ -37,7 +37,7 @@ describe('SuperRareToken', function() {
     expect((await this.superRareToken.hasRole(pauserRole, addr1.address))).to.equal(false);
   });
 
-  it('Token Minting Functionality', async function() {
+  it('Token Minting Functionality', async function () {
     const [owner, addr1] = await ethers.getSigners();
     const newMint = '20000000000000000000000';
     const minterRole = await this.superRareToken.MINTER_ROLE();
@@ -48,13 +48,13 @@ describe('SuperRareToken', function() {
 
     await this.superRareToken.revokeRole(minterRole, owner.address);
 
-    await expectRevert( 
+    await expectRevert(
       this.superRareToken.mint(addr1.address, newMint),
       "ERC20PresetMinterPauser: must have minter role to mint"
     );
   });
 
-  it('Token Pausing Functionality', async function() {
+  it('Token Pausing Functionality', async function () {
     const [owner, addr1] = await ethers.getSigners();
     const amnt = '20000000000000000000000';
     const pauserRole = await this.superRareToken.PAUSER_ROLE();
@@ -65,7 +65,7 @@ describe('SuperRareToken', function() {
 
     expect((await this.superRareToken.paused())).to.equal(true);
 
-    await expectRevert( 
+    await expectRevert(
       this.superRareToken.transfer(addr1.address, amnt),
       "ERC20Pausable: token transfer while paused"
     );
@@ -76,7 +76,7 @@ describe('SuperRareToken', function() {
 
     await this.superRareToken.revokeRole(pauserRole, owner.address);
 
-    await expectRevert( 
+    await expectRevert(
       this.superRareToken.pause(),
       "ERC20PresetMinterPauser: must have pauser role to pause"
     );
