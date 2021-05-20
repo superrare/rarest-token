@@ -3,16 +3,16 @@
 pragma solidity ^0.7.3;
 
 import "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./ISuperRareStaking.sol";
 
-contract SuperRareStaking is ISuperRareStaking, Initializable, Ownable {
+contract SuperRareStaking is ISuperRareStaking, Initializable, OwnableUpgradeable {
   struct Stake {
 	  uint256 amount;
-      uint256 length; // measured in days
+    uint256 length; // measured in days
 	  uint256 startingTime;
-      bool hasClaimed;
+    bool hasClaimed;
   }
 
   IERC20 stakingToken;
@@ -22,15 +22,21 @@ contract SuperRareStaking is ISuperRareStaking, Initializable, Ownable {
   mapping (address => Stake[]) stakes;
 
   // Not exactly sure how to organize the (staking length : reward percentages) values
-  uint256[] stakingLengths;
-  mapping (uint256 => uint256) rewardRatios;
+  uint256[] public stakingLengths;
+  mapping (uint256 => uint256) public rewardRatios;
 
-  function initialize(address _tokenAddress) public initializer {
+  function initialize(
+    address _tokenAddress, 
+    uint256[] memory _durations,
+    uint256[] memory _rates
+  ) public initializer {
+      require(_tokenAddress != address(0));
+      require(_durations.length == _rates.length);
+      for (uint256 i = 0; i < _durations.length; i++) {
+        rewardRatios[_durations[i]] = _rates[i];
+      }
       stakingToken = IERC20(_tokenAddress);
-      stakingLengths = [30 days, 90 days, 180 days];
-      rewardRatios[30 days] = 2;
-      rewardRatios[90 days] = 5;
-      rewardRatios[180 days] = 10;
+      stakingLengths = _durations;
   }
 
   function stake(uint256 amount, uint256 length) external override {
@@ -59,7 +65,7 @@ contract SuperRareStaking is ISuperRareStaking, Initializable, Ownable {
       require (block.timestamp >= currentStake.startingTime + currentStake.length, "Stake has not expired yet.");
 
       // This would make it so that a user cannot unstake unless they have claimed rewards
-      require (!currentStake.hasClaimed)
+      require (!currentStake.hasClaimed);
 
       uint256 amount = currentStake.amount;
       uint256 length = currentStake.length;
