@@ -9,10 +9,16 @@ import "@openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./ISuperRareStaking.sol";
 
-contract SuperRareStaking is ISuperRareStaking, Initializable, OwnableUpgradeable, PausableUpgradeable {
+contract SuperRareStaking is
+    ISuperRareStaking,
+    Initializable,
+    OwnableUpgradeable,
+    PausableUpgradeable
+{
     using SafeMathUpgradeable for uint256;
 
-    uint256 MAX_INT = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
+    uint256 MAX_INT =
+        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
 
     struct Stake {
         uint256 amount;
@@ -26,10 +32,10 @@ contract SuperRareStaking is ISuperRareStaking, Initializable, OwnableUpgradeabl
     uint256 totalPendingRewards;
     address poolAddress;
 
-    mapping (address => uint256) totalStakeBalances;
-    mapping (address => Stake[]) stakes;
+    mapping(address => uint256) totalStakeBalances;
+    mapping(address => Stake[]) stakes;
 
-    mapping (uint256 => uint256) public rewardRatios;
+    mapping(uint256 => uint256) public rewardRatios;
 
     function initialize(
         address _tokenAddress,
@@ -38,34 +44,44 @@ contract SuperRareStaking is ISuperRareStaking, Initializable, OwnableUpgradeabl
         uint256[] memory _rates
     ) public initializer {
         require(_tokenAddress != address(0));
+        require(_poolAddress != address(0));
         require(_durations.length == _rates.length);
         for (uint256 i = 0; i < _durations.length; i++) {
             rewardRatios[_durations[i]] = _rates[i];
         }
+        __Ownable_init();
+        __Pausable_init();
         stakingToken = IERC20(_tokenAddress);
         poolAddress = _poolAddress;
         stakingToken.approve(address(this), MAX_INT);
     }
 
     /* MUTABLE */
-    function stake(uint256 amount, uint256 length) external override whenNotPaused {
-        require (amount > 0, "Must stake more than 0 tokens."); // Might change this to have some sort of minimum
-        require (stakingToken.balanceOf(msg.sender) >= amount, "User does not have enough token.");
-        require (rewardRatios[length] > 0, "Invalid length."); // Check that it is a valid length
+    function stake(uint256 amount, uint256 length)
+        external
+        override
+        whenNotPaused
+    {
+        require(amount > 0, "Must stake more than 0 tokens."); // Might change this to have some sort of minimum
+        require(
+            stakingToken.balanceOf(msg.sender) >= amount,
+            "User does not have enough token."
+        );
+        require(rewardRatios[length] > 0, "Invalid length."); // Check that it is a valid length
 
-        uint256 reward = amount * rewardRatios[length]/100;
-        require (stakingToken.balanceOf(poolAddress) >= totalStaked + totalPendingRewards + reward,
-        "Pool does not have enough liquidity.");
-
-        Stake memory newStake = Stake (
-            amount,
-            length,
-            block.timestamp,
-            reward
+        uint256 reward = (amount * rewardRatios[length]) / 100;
+        require(
+            stakingToken.balanceOf(poolAddress) >=
+                totalStaked + totalPendingRewards + reward,
+            "Pool does not have enough liquidity."
         );
 
+        Stake memory newStake = Stake(amount, length, block.timestamp, reward);
+
         stakes[msg.sender].push(newStake);
-        totalStakeBalances[msg.sender] = totalStakeBalances[msg.sender].add(amount);
+        totalStakeBalances[msg.sender] = totalStakeBalances[msg.sender].add(
+            amount
+        );
         totalStaked = totalStaked.add(amount);
         totalPendingRewards = totalPendingRewards.add(reward);
 
@@ -74,10 +90,16 @@ contract SuperRareStaking is ISuperRareStaking, Initializable, OwnableUpgradeabl
     }
 
     function unstake(uint256 index) external override {
-        require (stakes[msg.sender].length > index, "Stake index out of bounds.");
+        require(
+            stakes[msg.sender].length > index,
+            "Stake index out of bounds."
+        );
         Stake memory currentStake = stakes[msg.sender][index];
-        require (currentStake.amount > 0, "Stake was already withdrawn.");
-        require (block.timestamp >= currentStake.startingTime + currentStake.length, "Stake has not expired yet.");
+        require(currentStake.amount > 0, "Stake was already withdrawn.");
+        require(
+            block.timestamp >= currentStake.startingTime + currentStake.length,
+            "Stake has not expired yet."
+        );
 
         uint256 amount = currentStake.amount;
         uint256 length = currentStake.length;
@@ -87,26 +109,34 @@ contract SuperRareStaking is ISuperRareStaking, Initializable, OwnableUpgradeabl
         delete stakes[msg.sender][index];
 
         // Update state variables
-        totalStakeBalances[msg.sender] = totalStakeBalances[msg.sender].sub(amount);
+        totalStakeBalances[msg.sender] = totalStakeBalances[msg.sender].sub(
+            amount
+        );
         totalStaked = totalStaked.sub(amount);
         totalPendingRewards = totalPendingRewards.sub(reward);
 
         // Transfer original stake + reward
-        stakingToken.transferFrom(poolAddress, msg.sender, amount+reward);
+        stakingToken.transfer(msg.sender, amount);
+        stakingToken.transferFrom(poolAddress, msg.sender, reward);
 
         emit Unstaked(msg.sender, index, amount, length);
     }
 
     /* GETTERS */
-    function getTotalStaked() external override view returns (uint256) {
+    function getTotalStaked() external view override returns (uint256) {
         return totalStaked;
     }
 
-    function token() external override view returns (address) {
+    function token() external view override returns (address) {
         return address(stakingToken);
     }
 
-    function getTotalStakedByAddress(address staker) external override view returns(uint256) {
+    function getTotalStakedByAddress(address staker)
+        external
+        view
+        override
+        returns (uint256)
+    {
         return totalStakeBalances[staker];
     }
 
@@ -115,7 +145,10 @@ contract SuperRareStaking is ISuperRareStaking, Initializable, OwnableUpgradeabl
     }
 
     /* ADMIN FUNCTIONS */
-    function updateRewardRatio(uint256 length, uint256 rate) external onlyOwner {
+    function updateRewardRatio(uint256 length, uint256 rate)
+        external
+        onlyOwner
+    {
         rewardRatios[length] = rate;
     }
 
@@ -126,13 +159,20 @@ contract SuperRareStaking is ISuperRareStaking, Initializable, OwnableUpgradeabl
 
         if (_paused) {
             _pause();
-        }
-        else {
+        } else {
             _unpause();
         }
     }
 
     function setPoolAddress(address _poolAddress) external onlyOwner {
+        require(_poolAddress != address(0));
         poolAddress = _poolAddress;
     }
+
+    // function flushFunds(address _to) external onlyOwner whenPaused {
+    //   require(_to != address(0));
+    //   address stakingContract = address(this);
+    //   uint256 balance = stakingToken.balanceOf(stakingContract);
+    //   stakingToken.transfer(_to, balance);
+    // }
 }

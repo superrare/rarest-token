@@ -54,7 +54,116 @@ describe('SuperRareStaking', function () {
   });
 
   describe('Admin Functions', function () {
+    describe('Ownable', function () {
+      it('Check Owner Set Correctly', async function() {
+        // Arrange 
+        const [owner] = await ethers.getSigners();
 
+        // Act
+        const stakingOwner = await this.superRareStaking.owner();
+
+        // Assert
+        expect(stakingOwner).to.equal(owner.address);
+      });
+
+      it('Check OnlyOwner Functions - success', async function () {
+        // Arrange
+        const [_, addr1] = await ethers.getSigners();
+
+        // Act
+        await this.superRareStaking.updateRewardRatio(15552000, 11);
+        await this.superRareStaking.updateRewardRatio(31536000, 25);
+        await this.superRareStaking.setPoolAddress(addr1.address);
+        await this.superRareStaking.setPaused(true);
+        const rewardRatio180 = (await this.superRareStaking.rewardRatios(15552000)).toString();
+        const rewardRatio365 = (await this.superRareStaking.rewardRatios(31536000)).toString();
+        const poolAddress = await this.superRareStaking.getPoolAddress();
+        const isPaused = await this.superRareStaking.paused();
+
+        // Assert
+        expect(rewardRatio180).to.equal("11");
+        expect(rewardRatio365).to.equal("25");
+        expect(poolAddress).to.equal(addr1.address);
+        expect(isPaused).to.equal(true);
+      });
+
+      it('Check OnlyOwner Functions - success', async function () {
+        // Arrange
+        const [_, addr1] = await ethers.getSigners();
+
+        // Act
+        await expectRevert(
+          this.superRareStaking.connect(addr1).updateRewardRatio(15552000, 11),
+          "Ownable: caller is not the owner"
+        );
+        await expectRevert(
+          this.superRareStaking.connect(addr1).updateRewardRatio(31536000, 25),
+          "Ownable: caller is not the owner"
+        );
+        await expectRevert(
+          this.superRareStaking.connect(addr1).setPoolAddress(addr1.address),
+          "Ownable: caller is not the owner"
+        );
+        await expectRevert(
+          this.superRareStaking.connect(addr1).setPaused(true),
+          "Ownable: caller is not the owner"
+        );
+        const rewardRatio180 = (await this.superRareStaking.rewardRatios(15552000)).toString();
+        const rewardRatio365 = (await this.superRareStaking.rewardRatios(31536000)).toString();
+        const poolAddress = await this.superRareStaking.getPoolAddress();
+        const isPaused = await this.superRareToken.paused();
+
+        // Assert
+        expect(rewardRatio180).to.equal("10");
+        expect(rewardRatio365).to.equal("0");
+        expect(poolAddress).to.equal(this.superRareStaking.address);
+        expect(isPaused).to.equal(false);
+      });
+    });
+
+    describe('Pausble', function () {
+      it('Can Stake Tokens When Unpaused', async function () {
+        // Arrange 
+        const [owner] = await ethers.getSigners();
+        const durations = [2592000, 7776000, 15552000];
+        await this.superRareToken.transfer(this.superRareStaking.address, "100000000000000000000000");
+        await this.superRareToken.approve(this.superRareStaking.address, "1000000000000000000000000");
+        const isPaused = await this.superRareToken.paused();
+    
+        // Act
+        await this.superRareStaking.stake("10000000000000000000", durations[0]);
+        const amtStakedByUser = (await this.superRareStaking.getTotalStakedByAddress(owner.address)).toString();
+        const totalStaked = (await this.superRareStaking.getTotalStaked()).toString();
+    
+        // Assert
+        expect(isPaused).to.equal(false);
+        expect(amtStakedByUser).to.equal("10000000000000000000");
+        expect(totalStaked).to.equal("10000000000000000000");
+      });
+
+      it('Cant Stake Tokens When Paused', async function () {
+        // Arrange 
+        const [owner] = await ethers.getSigners();
+        const durations = [2592000, 7776000, 15552000];
+        await this.superRareToken.transfer(this.superRareStaking.address, "100000000000000000000000");
+        await this.superRareToken.approve(this.superRareStaking.address, "1000000000000000000000000");
+        
+        // Act
+        await this.superRareStaking.setPaused(true);
+        await expectRevert(
+          this.superRareStaking.stake("10000", durations[0]),
+          "Pausable: paused"
+          );
+          const amtStakedByUser = (await this.superRareStaking.getTotalStakedByAddress(owner.address)).toString();
+          const totalStaked = (await this.superRareStaking.getTotalStaked()).toString();
+          const isPaused = await this.superRareStaking.paused();
+    
+        // Assert
+        expect(isPaused).to.equal(true);
+        expect(amtStakedByUser).to.equal("0");
+        expect(totalStaked).to.equal("0");
+      });
+    });
   });
 
   describe('Stake', function () {
@@ -244,7 +353,7 @@ describe('SuperRareStaking', function () {
       const totalStakedBefore = (await this.superRareStaking.getTotalStaked()).toString();
       await expectRevert(
         this.superRareStaking.connect(addr1).unstake(0),
-        "Invalid stake index or no stake."
+        "Stake index out of bounds."
       );
       const amtStakedByUserAfter = (await this.superRareStaking.getTotalStakedByAddress(addr1.address)).toString();
       const totalStakedAfter = (await this.superRareStaking.getTotalStaked()).toString();
@@ -272,7 +381,7 @@ describe('SuperRareStaking', function () {
       const totalStakedBefore = (await this.superRareStaking.getTotalStaked()).toString();
       await expectRevert(
         this.superRareStaking.connect(addr1).unstake(1),
-        "Invalid stake index or no stake."
+        "Stake index out of bounds."
       );
       const amtStakedByUserAfter = (await this.superRareStaking.getTotalStakedByAddress(addr1.address)).toString();
       const totalStakedAfter = (await this.superRareStaking.getTotalStaked()).toString();
@@ -284,6 +393,36 @@ describe('SuperRareStaking', function () {
       expect(amtStakedByUserAfter).to.equal("1000");
       expect(totalStakedAfter).to.equal("1000");
       expect(balanceOfUser).to.equal("0");
+    });
+
+    it('Single User - Cant Unstake Again', async function () {
+      // Arrange 
+      const [_, addr1] = await ethers.getSigners();
+      const durations = [2592000, 7776000, 15552000];
+      await this.superRareToken.transfer(this.superRareStaking.address, "100000000000000000000000");
+      await this.superRareToken.transfer(addr1.address, "1000");
+      await this.superRareToken.connect(addr1).approve(this.superRareStaking.address, "1000000000000000000000000");
+      await this.superRareStaking.connect(addr1).stake("1000", durations[0]);
+  
+      // Act
+      const amtStakedByUserBefore = (await this.superRareStaking.getTotalStakedByAddress(addr1.address)).toString();
+      const totalStakedBefore = (await this.superRareStaking.getTotalStaked()).toString();
+      await advanceTime(durations[0]);
+      await this.superRareStaking.connect(addr1).unstake(0);
+      await expectRevert(
+        this.superRareStaking.connect(addr1).unstake(0),
+        "Stake was already withdrawn."
+      );
+      const amtStakedByUserAfter = (await this.superRareStaking.getTotalStakedByAddress(addr1.address)).toString();
+      const totalStakedAfter = (await this.superRareStaking.getTotalStaked()).toString();
+      const balanceOfUser = (await this.superRareToken.balanceOf(addr1.address)).toString();
+  
+      // Assert
+      expect(amtStakedByUserBefore).to.equal("1000");
+      expect(totalStakedBefore).to.equal("1000");
+      expect(amtStakedByUserAfter).to.equal("0");
+      expect(totalStakedAfter).to.equal("0");
+      expect(balanceOfUser).to.equal("1020");
     });
 
     it('Multi User - success', async function () {
@@ -338,6 +477,52 @@ describe('SuperRareStaking', function () {
       expect(totalStakedAfter).to.equal("0");
       expect(balanceOfUser1After).to.equal("1020");
       expect(balanceOfUser2After).to.equal("2100");
+    });
+
+    it('Single User - Stake, Unstake, Stake, Unstake - success', async function() {
+      // Arrange 
+      const [_, addr1] = await ethers.getSigners();
+      const durations = [2592000, 7776000, 15552000];
+      await this.superRareToken.transfer(this.superRareStaking.address, "100000000000000000000000");
+      await this.superRareToken.transfer(addr1.address, "2000");
+      await this.superRareToken.connect(addr1).approve(this.superRareStaking.address, "1000000000000000000000000");
+      
+      // Act
+      await this.superRareStaking.connect(addr1).stake("1000", durations[0]);
+      await advanceTime(durations[0]);
+      await this.superRareStaking.connect(addr1).unstake(0);
+
+      await this.superRareStaking.connect(addr1).stake("1000", durations[0]);
+      await advanceTime(durations[0]);
+      await this.superRareStaking.connect(addr1).unstake(1);
+
+      const balanceOfUser = (await this.superRareToken.balanceOf(addr1.address)).toString();
+  
+      // Assert
+      expect(balanceOfUser).to.equal("2040");
+    });
+
+    it('Single User - Stake, Stake, Unstake, Unstake - success', async function() {
+      // Arrange 
+      const [_, addr1] = await ethers.getSigners();
+      const durations = [2592000, 7776000, 15552000];
+      await this.superRareToken.transfer(this.superRareStaking.address, "100000000000000000000000");
+      await this.superRareToken.transfer(addr1.address, "2000");
+      await this.superRareToken.connect(addr1).approve(this.superRareStaking.address, "1000000000000000000000000");
+      const timeDiff = durations[1] - durations[0];
+      
+      // Act
+      await this.superRareStaking.connect(addr1).stake("1000", durations[0]);
+      await this.superRareStaking.connect(addr1).stake("1000", durations[1]);
+      await advanceTime(durations[0]);
+      await advanceTime(timeDiff);
+      await this.superRareStaking.connect(addr1).unstake(0);
+      await this.superRareStaking.connect(addr1).unstake(1);
+
+      const balanceOfUser = (await this.superRareToken.balanceOf(addr1.address)).toString();
+  
+      // Assert
+      expect(balanceOfUser).to.equal("2070");
     });
   });
 });
