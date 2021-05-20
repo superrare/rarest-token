@@ -74,9 +74,9 @@ contract SuperRareStaking is ISuperRareStaking, Initializable, OwnableUpgradeabl
     }
 
     function unstake(uint256 index) external override {
-        Stake[] memory currentStakes = stakes[msg.sender];
-        require (currentStakes.length > index && currentStakes.amount > 0, "Invalid stake index or no stake.");
-        Stake memory currentStake = currentStakes[index];
+        require (stakes[msg.sender].length > index, "Stake index out of bounds.");
+        Stake memory currentStake = stakes[msg.sender][index];
+        require (currentStake.amount > 0, "Stake was already withdrawn.");
         require (block.timestamp >= currentStake.startingTime + currentStake.length, "Stake has not expired yet.");
 
         uint256 amount = currentStake.amount;
