@@ -9,10 +9,9 @@ import "./ISuperRareStaking.sol";
 
 contract SuperRareStaking is ISuperRareStaking, Initializable, OwnableUpgradeable {
   struct Stake {
-	  uint256 amount;
-    uint256 length; // measured in days
+      uint256 amount;
+      uint256 length;
 	  uint256 startingTime;
-    bool hasClaimed;
   }
 
   IERC20 stakingToken;
@@ -22,15 +21,14 @@ contract SuperRareStaking is ISuperRareStaking, Initializable, OwnableUpgradeabl
   mapping (address => uint256) totalStakeBalances;
   mapping (address => Stake[]) stakes;
 
-  // Not exactly sure how to organize the (staking length : reward percentages) values
-  uint256[] public stakingLengths;
+  uint256[] public stakingLengths;  // Is this necessary?
   mapping (uint256 => uint256) public rewardRatios;
 
   function initialize(
-    address _tokenAddress, 
-    address _poolAddress,
-    uint256[] memory _durations,
-    uint256[] memory _rates
+      address _tokenAddress,
+      address _poolAddress,
+      uint256[] memory _durations,
+      uint256[] memory _rates
   ) public initializer {
       require(_tokenAddress != address(0));
       require(_durations.length == _rates.length);
@@ -50,8 +48,7 @@ contract SuperRareStaking is ISuperRareStaking, Initializable, OwnableUpgradeabl
       Stake memory newStake = Stake (
           amount,
           length,
-          block.timestamp,
-          false
+          block.timestamp
       );
 
       stakes[msg.sender].push(newStake);
@@ -67,32 +64,22 @@ contract SuperRareStaking is ISuperRareStaking, Initializable, OwnableUpgradeabl
       require (currentStake.amount > 0, "Invalid stake index or no stake.");
       require (block.timestamp >= currentStake.startingTime + currentStake.length, "Stake has not expired yet.");
 
-      // This would make it so that a user cannot unstake unless they have claimed rewards
-      require (!currentStake.hasClaimed);
-
+      // Update state variables
       uint256 amount = currentStake.amount;
       uint256 length = currentStake.length;
       totalStaked -= amount;
       totalStakeBalances[msg.sender] -= amount;
 
+      // Delete stake entry
       delete stakes[msg.sender][index];
+
+      // Calculate and transfer reward
+      uint256 reward = amount * rewardRatios[length]/100;
+      /* Add transfer from pool here. */
 
       stakingToken.transferFrom(poolAddress, msg.sender, amount);
 
       emit Unstaked(msg.sender, index, amount, length);
-  }
-
-  function claimReward(uint256 index) external override {
-      Stake memory currentStake = stakes[msg.sender][index];
-      require (currentStake.amount > 0, "Invalid stake index or no stake.");
-      require (block.timestamp >= currentStake.startingTime + currentStake.length, "Stake has not expired yet.");
-      require (!currentStake.hasClaimed, "User has already claimed reward.");
-
-      uint256 reward = currentStake.amount * rewardRatios[currentStake.length]/100;
-
-      // Add minting line here.
-
-      stakes[msg.sender][index].hasClaimed = true;
   }
 
   function getTotalStaked() external override view returns (uint256) {
@@ -105,5 +92,9 @@ contract SuperRareStaking is ISuperRareStaking, Initializable, OwnableUpgradeabl
 
   function getTotalStakedByAddress(address staker) external override view returns(uint256) {
     return totalStakeBalances[staker];
+  }
+
+  function updateRewardRatio(uint256 length, uint256 rate) external onlyOwner {
+      rewardRatios[length] = rate;
   }
 }
