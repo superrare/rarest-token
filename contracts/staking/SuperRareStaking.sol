@@ -47,7 +47,7 @@ contract SuperRareStaking is ISuperRareStaking, Initializable, OwnableUpgradeabl
         stakingToken.approve(address(this), MAX_INT);
     }
 
-  /* MUTABLE */
+    /* MUTABLE */
     function stake(uint256 amount, uint256 length) external override whenNotPaused {
         require (amount > 0, "Must stake more than 0 tokens."); // Might change this to have some sort of minimum
         require (stakingToken.balanceOf(msg.sender) >= amount, "User does not have enough token.");
@@ -71,11 +71,11 @@ contract SuperRareStaking is ISuperRareStaking, Initializable, OwnableUpgradeabl
 
         stakingToken.transferFrom(msg.sender, poolAddress, amount);
         emit Staked(msg.sender, stakes[msg.sender].length, amount, length);
-  }
+    }
 
     function unstake(uint256 index) external override {
         Stake[] memory currentStakes = stakes[msg.sender];
-        require (currentStakes.length > index, "Invalid stake index or no stake.");
+        require (currentStakes.length > index && currentStakes.amount > 0, "Invalid stake index or no stake.");
         Stake memory currentStake = currentStakes[index];
         require (block.timestamp >= currentStake.startingTime + currentStake.length, "Stake has not expired yet.");
 
@@ -97,7 +97,7 @@ contract SuperRareStaking is ISuperRareStaking, Initializable, OwnableUpgradeabl
         emit Unstaked(msg.sender, index, amount, length);
     }
 
-  /* GETTERS */
+    /* GETTERS */
     function getTotalStaked() external override view returns (uint256) {
         return totalStaked;
     }
