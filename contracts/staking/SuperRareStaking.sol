@@ -17,9 +17,6 @@ contract SuperRareStaking is
 {
     using SafeMathUpgradeable for uint256;
 
-    uint256 MAX_INT =
-        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
-
     struct Stake {
         uint256 amount;
         uint256 length;
@@ -53,7 +50,8 @@ contract SuperRareStaking is
         __Pausable_init();
         stakingToken = IERC20(_tokenAddress);
         poolAddress = _poolAddress;
-        stakingToken.approve(address(this), MAX_INT);
+        uint256 maxInt = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
+        stakingToken.approve(address(this), maxInt);
     }
 
     /* MUTABLE */
