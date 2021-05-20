@@ -59,6 +59,7 @@ describe('SuperRareStaking', function () {
       // Arrange 
       const [owner] = await ethers.getSigners();
       const durations = [2592000, 7776000, 15552000];
+      await this.superRareToken.transfer(this.superRareStaking.address, "100000000000000000000000");
       await this.superRareToken.approve(this.superRareStaking.address, "1000000000000000000000000");
   
       // Act
@@ -75,6 +76,7 @@ describe('SuperRareStaking', function () {
       // Arrange 
       const [_, addr1] = await ethers.getSigners();
       const durations = [2592000, 7776000, 15552000];
+      await this.superRareToken.transfer(this.superRareStaking.address, "100000000000000000000000");
       await this.superRareToken.approve(this.superRareStaking.address, "1000000000000000000000000");
   
       // Act
@@ -94,6 +96,7 @@ describe('SuperRareStaking', function () {
       // Arrange 
       const [owner] = await ethers.getSigners();
       const durations = [2592000, 7776000, 15552000];
+      await this.superRareToken.transfer(this.superRareStaking.address, "100000000000000000000000");
       await this.superRareToken.approve(this.superRareStaking.address, "1000000000000000000000000");
   
       // Act
@@ -113,6 +116,7 @@ describe('SuperRareStaking', function () {
       // Arrange 
       const [owner] = await ethers.getSigners();
       const durations = [2592000, 7776000, 15552000];
+      await this.superRareToken.transfer(this.superRareStaking.address, "100000000000000000000000");
       await this.superRareToken.approve(this.superRareStaking.address, "1000000000000000000000000");
   
       // Act
@@ -132,7 +136,8 @@ describe('SuperRareStaking', function () {
       // Arrange 
       const [owner, addr1] = await ethers.getSigners();
       const durations = [2592000, 7776000, 15552000];
-      await this.superRareToken.transfer(addr1.address, "500000000000000000000000")
+      await this.superRareToken.transfer(this.superRareStaking.address, "100000000000000000000000");
+      await this.superRareToken.transfer(addr1.address, "500000000000000000000000");
       await this.superRareToken.approve(this.superRareStaking.address, "500000000000000000000000");
       await this.superRareToken.connect(addr1).approve(this.superRareStaking.address, "500000000000000000000000");
   
@@ -149,6 +154,23 @@ describe('SuperRareStaking', function () {
       expect(totalStaked).to.equal("20000000000000000000");
     });
 
-
+    it('Pool Should Have Enough To Payout Reward', async function() {
+      // Arrange 
+      const [owner] = await ethers.getSigners();
+      const durations = [2592000, 7776000, 15552000];
+      await this.superRareToken.approve(this.superRareStaking.address, "1000000000000000000000000");
+  
+      // Act
+      await expectRevert(
+        this.superRareStaking.stake("10000000000000000000", durations[0]),
+        "Pool doesnt have enough tokens to pay staking reward."
+      );
+      const amtStakedByUser = (await this.superRareStaking.getTotalStakedByAddress(owner.address)).toString();
+      const totalStaked = (await this.superRareStaking.getTotalStaked()).toString();
+  
+      // Assert
+      expect(amtStakedByUser).to.equal("0");
+      expect(totalStaked).to.equal("0");
+    });
   });
 });
