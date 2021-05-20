@@ -166,7 +166,7 @@ describe('SuperRareStaking', function () {
       // Act
       await expectRevert(
         this.superRareStaking.stake("10000000000000000000", durations[0]),
-        "Pool doesnt have enough tokens to pay staking reward."
+        "Pool does not have enough liquidity."
       );
       const amtStakedByUser = (await this.superRareStaking.getTotalStakedByAddress(owner.address)).toString();
       const totalStaked = (await this.superRareStaking.getTotalStaked()).toString();
@@ -255,7 +255,7 @@ describe('SuperRareStaking', function () {
       expect(totalStakedBefore).to.equal("0");
       expect(amtStakedByUserAfter).to.equal("0");
       expect(totalStakedAfter).to.equal("0");
-      expect(balanceOfUser).to.equal("0");
+      expect(balanceOfUser).to.equal("1000");
     });
 
     it('Single User - Cant Unstake NonExistent Stake', async function () {
@@ -279,10 +279,10 @@ describe('SuperRareStaking', function () {
       const balanceOfUser = (await this.superRareToken.balanceOf(addr1.address)).toString();
   
       // Assert
-      expect(amtStakedByUserBefore).to.equal("0");
-      expect(totalStakedBefore).to.equal("0");
-      expect(amtStakedByUserAfter).to.equal("0");
-      expect(totalStakedAfter).to.equal("0");
+      expect(amtStakedByUserBefore).to.equal("1000");
+      expect(totalStakedBefore).to.equal("1000");
+      expect(amtStakedByUserAfter).to.equal("1000");
+      expect(totalStakedAfter).to.equal("1000");
       expect(balanceOfUser).to.equal("0");
     });
 

@@ -12,6 +12,8 @@ import "./ISuperRareStaking.sol";
 contract SuperRareStaking is ISuperRareStaking, Initializable, OwnableUpgradeable, PausableUpgradeable {
     using SafeMathUpgradeable for uint256;
 
+    uint256 MAX_INT = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
+
     struct Stake {
         uint256 amount;
         uint256 length;
@@ -42,6 +44,7 @@ contract SuperRareStaking is ISuperRareStaking, Initializable, OwnableUpgradeabl
         }
         stakingToken = IERC20(_tokenAddress);
         poolAddress = _poolAddress;
+        stakingToken.approve(address(this), MAX_INT);
     }
 
   /* MUTABLE */
@@ -71,8 +74,9 @@ contract SuperRareStaking is ISuperRareStaking, Initializable, OwnableUpgradeabl
   }
 
     function unstake(uint256 index) external override {
-        Stake memory currentStake = stakes[msg.sender][index];
-        require (currentStake.amount > 0, "Invalid stake index or no stake.");
+        Stake[] memory currentStakes = stakes[msg.sender];
+        require (currentStakes.length > index, "Invalid stake index or no stake.");
+        Stake memory currentStake = currentStakes[index];
         require (block.timestamp >= currentStake.startingTime + currentStake.length, "Stake has not expired yet.");
 
         uint256 amount = currentStake.amount;
