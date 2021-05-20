@@ -13,4 +13,5 @@ interface ISuperRareStaking {
     function getTotalStaked() external view returns (uint256);
     function token() external view returns (address);
     function claimReward(uint256 index) external;
+    function getTotalStakedByAddress(address staker) external view returns(uint256);
 }

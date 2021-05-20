@@ -100,4 +100,7 @@ contract SuperRareStaking is ISuperRareStaking, Initializable, OwnableUpgradeabl
       return address(stakingToken);
   }
 
+  function getTotalStakedByAddress(address staker) external override view returns(uint256) {
+    return totalStakeBalances[staker];
+  }
 }
