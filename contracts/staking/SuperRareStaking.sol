@@ -17,6 +17,7 @@ contract SuperRareStaking is ISuperRareStaking, Initializable, OwnableUpgradeabl
 
   IERC20 stakingToken;
   uint256 totalStaked;
+  address poolAddress;
 
   mapping (address => uint256) totalStakeBalances;
   mapping (address => Stake[]) stakes;
@@ -27,6 +28,7 @@ contract SuperRareStaking is ISuperRareStaking, Initializable, OwnableUpgradeabl
 
   function initialize(
     address _tokenAddress, 
+    address _poolAddress,
     uint256[] memory _durations,
     uint256[] memory _rates
   ) public initializer {
@@ -35,8 +37,9 @@ contract SuperRareStaking is ISuperRareStaking, Initializable, OwnableUpgradeabl
       for (uint256 i = 0; i < _durations.length; i++) {
         rewardRatios[_durations[i]] = _rates[i];
       }
-      stakingToken = IERC20(_tokenAddress);
       stakingLengths = _durations;
+      stakingToken = IERC20(_tokenAddress);
+      poolAddress = _poolAddress;
   }
 
   function stake(uint256 amount, uint256 length) external override {
@@ -55,7 +58,7 @@ contract SuperRareStaking is ISuperRareStaking, Initializable, OwnableUpgradeabl
       totalStakeBalances[msg.sender] += amount;
       totalStaked += amount;
 
-      stakingToken.transferFrom(msg.sender, address(this), amount);
+      stakingToken.transferFrom(msg.sender, poolAddress, amount);
       emit Staked(msg.sender, stakes[msg.sender].length, amount, length);
   }
 
@@ -74,7 +77,7 @@ contract SuperRareStaking is ISuperRareStaking, Initializable, OwnableUpgradeabl
 
       delete stakes[msg.sender][index];
 
-      stakingToken.transferFrom(address(this), msg.sender, amount);
+      stakingToken.transferFrom(poolAddress, msg.sender, amount);
 
       emit Unstaked(msg.sender, index, amount, length);
   }
