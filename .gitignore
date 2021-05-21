@@ -10,3 +10,5 @@ cache/
 output
 
 secrets.json
+.openzeppelin
+.DS_Store
