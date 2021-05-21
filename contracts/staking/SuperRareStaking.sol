@@ -166,11 +166,4 @@ contract SuperRareStaking is
         require(_poolAddress != address(0));
         poolAddress = _poolAddress;
     }
-
-    // function flushFunds(address _to) external onlyOwner whenPaused {
-    //   require(_to != address(0));
-    //   address stakingContract = address(this);
-    //   uint256 balance = stakingToken.balanceOf(stakingContract);
-    //   stakingToken.transfer(_to, balance);
-    // }
 }
