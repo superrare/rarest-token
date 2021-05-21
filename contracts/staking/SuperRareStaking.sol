@@ -70,7 +70,7 @@ contract SuperRareStaking is
         uint256 reward = (amount * rewardRatios[length]) / 100;
         require(
             stakingToken.balanceOf(poolAddress) >=
-                totalStaked + totalPendingRewards + reward,
+                totalStaked.add(totalPendingRewards).add(reward),
             "Pool does not have enough liquidity."
         );
 
@@ -95,7 +95,7 @@ contract SuperRareStaking is
         Stake memory currentStake = stakes[msg.sender][index];
         require(currentStake.amount > 0, "Stake was already withdrawn.");
         require(
-            block.timestamp >= currentStake.startingTime + currentStake.length,
+            block.timestamp >= currentStake.startingTime.add(currentStake.length),
             "Stake has not expired yet."
         );
 
