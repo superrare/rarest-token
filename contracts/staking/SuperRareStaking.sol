@@ -60,17 +60,17 @@ contract SuperRareStaking is
         override
         whenNotPaused
     {
-        require(amount > 0, "Must stake more than 0 tokens."); // Might change this to have some sort of minimum
+        require(amount > 0, "Must stake more than 0 tokens.");
         require(
             stakingToken.balanceOf(msg.sender) >= amount,
             "User does not have enough token."
         );
-        require(rewardRatios[length] > 0, "Invalid length."); // Check that it is a valid length
+        require(rewardRatios[length] > 0, "Invalid length.");
 
         uint256 reward = (amount * rewardRatios[length]) / 100;
         require(
             stakingToken.balanceOf(poolAddress) >=
-                totalStaked.add(totalPendingRewards).add(reward),
+                totalPendingRewards.add(reward),
             "Pool does not have enough liquidity."
         );
 
@@ -83,7 +83,7 @@ contract SuperRareStaking is
         totalStaked = totalStaked.add(amount);
         totalPendingRewards = totalPendingRewards.add(reward);
 
-        stakingToken.transferFrom(msg.sender, poolAddress, amount);
+        stakingToken.transferFrom(msg.sender, address(this), amount);
         emit Staked(msg.sender, stakes[msg.sender].length, amount, length);
     }
 
@@ -103,17 +103,14 @@ contract SuperRareStaking is
         uint256 length = currentStake.length;
         uint256 reward = currentStake.reward;
 
-        // Delete stake entry
         delete stakes[msg.sender][index];
 
-        // Update state variables
         totalStakeBalances[msg.sender] = totalStakeBalances[msg.sender].sub(
             amount
         );
         totalStaked = totalStaked.sub(amount);
         totalPendingRewards = totalPendingRewards.sub(reward);
 
-        // Transfer original stake + reward
         stakingToken.transfer(msg.sender, amount);
         stakingToken.transferFrom(poolAddress, msg.sender, reward);
 
