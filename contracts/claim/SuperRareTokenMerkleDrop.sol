@@ -17,6 +17,8 @@ contract SuperRareTokenMerkleDrop is ContextUpgradeable {
   );
 
   constructor(address superRareToken, bytes32 merkleRoot) {
+    require(superRareToken != address(0), "Token address cant be 0 address.");
+    require(merkleRoot != bytes32(0), "MerkleRoot cant be empty.");
     _owner = _msgSender();
     _superRareToken = IERC20Upgradeable(superRareToken);
     _merkleRoot = merkleRoot;
