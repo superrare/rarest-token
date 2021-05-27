@@ -1,6 +1,6 @@
 // contracts/staking/SuperRareStaking.sol
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.7.3;
+pragma solidity 0.7.3;
 
 import "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
@@ -40,9 +40,22 @@ contract SuperRareStaking is
         uint256[] memory _durations,
         uint256[] memory _rates
     ) public initializer {
-        require(_tokenAddress != address(0));
-        require(_poolAddress != address(0));
-        require(_durations.length == _rates.length);
+        require(
+            _tokenAddress != address(0), 
+            "initializer:tokenAddress cant be 0"    
+        );
+        require(
+            _poolAddress != address(0),
+            "initializer:poolAddress cant be 0"
+        );
+        require(
+            _poolAddress != address(this),
+            "initializer:poolAddress cant be staking contract"
+        );
+        require(
+            _durations.length == _rates.length,
+            "initializer:duration length should equal rates length"
+        );
         for (uint256 i = 0; i < _durations.length; i++) {
             rewardRatios[_durations[i]] = _rates[i];
         }
@@ -50,8 +63,6 @@ contract SuperRareStaking is
         __Pausable_init();
         stakingToken = IERC20(_tokenAddress);
         poolAddress = _poolAddress;
-        uint256 maxInt = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
-        stakingToken.approve(address(this), maxInt);
     }
 
     /* MUTABLE */
@@ -60,18 +71,20 @@ contract SuperRareStaking is
         override
         whenNotPaused
     {
-        require(amount > 0, "Must stake more than 0 tokens.");
+        require(amount > 0, "stake:Must stake more than 0 tokens."); // Might change this to have some sort of minimum
         require(
             stakingToken.balanceOf(msg.sender) >= amount,
-            "User does not have enough token."
+            "stake:User does not have enough token."
         );
-        require(rewardRatios[length] > 0, "Invalid length.");
+        require(rewardRatios[length] > 0, "stake:Invalid length."); // Check that it is a valid length
 
         uint256 reward = (amount * rewardRatios[length]) / 100;
+
+        // This is based on the fact that the pool is not the staking contract
         require(
             stakingToken.balanceOf(poolAddress) >=
                 totalPendingRewards.add(reward),
-            "Pool does not have enough liquidity."
+            "stake:Pool does not have enough liquidity."
         );
 
         Stake memory newStake = Stake(amount, length, block.timestamp, reward);
@@ -90,31 +103,29 @@ contract SuperRareStaking is
     function unstake(uint256 index) external override {
         require(
             stakes[msg.sender].length > index,
-            "Stake index out of bounds."
+            "unstake:Stake index out of bounds."
         );
         Stake memory currentStake = stakes[msg.sender][index];
-        require(currentStake.amount > 0, "Stake was already withdrawn.");
+        require(currentStake.amount > 0, "unstake:Stake was already withdrawn.");
         require(
             block.timestamp >= currentStake.startingTime.add(currentStake.length),
-            "Stake has not expired yet."
+            "unstake:Stake has not expired yet."
         );
 
-        uint256 amount = currentStake.amount;
-        uint256 length = currentStake.length;
-        uint256 reward = currentStake.reward;
-
+        // Delete stake entry
         delete stakes[msg.sender][index];
 
         totalStakeBalances[msg.sender] = totalStakeBalances[msg.sender].sub(
-            amount
+            currentStake.amount
         );
-        totalStaked = totalStaked.sub(amount);
-        totalPendingRewards = totalPendingRewards.sub(reward);
+        totalStaked = totalStaked.sub(currentStake.amount);
+        totalPendingRewards = totalPendingRewards.sub(currentStake.reward);
 
-        stakingToken.transfer(msg.sender, amount);
-        stakingToken.transferFrom(poolAddress, msg.sender, reward);
+        // Transfer original stake + reward
+        stakingToken.transfer(msg.sender, currentStake.amount);
+        stakingToken.transferFrom(poolAddress, msg.sender, currentStake.reward);
 
-        emit Unstaked(msg.sender, index, amount, length);
+        emit Unstaked(msg.sender, index, currentStake.amount, currentStake.length);
     }
 
     /* GETTERS */
@@ -160,7 +171,14 @@ contract SuperRareStaking is
     }
 
     function setPoolAddress(address _poolAddress) external onlyOwner {
-        require(_poolAddress != address(0));
+        require(
+            _poolAddress != address(0),
+            "initializer:poolAddress cant be 0"
+        );
+        require(
+            _poolAddress != address(this),
+            "initializer:poolAddress cant be staking contract"
+        );
         poolAddress = _poolAddress;
     }
 }
