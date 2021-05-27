@@ -123,7 +123,7 @@ contract Registry is InitializableV2, OwnableUpgradeable {
 
     /// @notice overloaded getContract to return explicit version of contract
     function getContract(bytes32 _name, uint256 _version) external view
-    returns (address contractAddr)
+        returns (address contractAddr)
     {
         _requireIsInitialized();
 
@@ -156,7 +156,11 @@ contract Registry is InitializableV2, OwnableUpgradeable {
         // main map for cheap lookup
         addressStorage[_key] = _value;
         // keep track of contract address history
-        addressStorageHistory[_key].push(_value);
+        if (_value == address(0x00)) {
+            addressStorageHistory[_key].pop();
+        }
+        else {
+            addressStorageHistory[_key].push(_value);
+        }
     }
-
 }

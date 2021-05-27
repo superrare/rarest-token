@@ -2,7 +2,7 @@
 require("@nomiclabs/hardhat-ethers");
 require('@openzeppelin/hardhat-upgrades');
 require("@nomiclabs/hardhat-waffle");
-const { ropstenNodeUrl, rinkebyNodeUrl, privateKey } = require('./secrets.json');
+//const { ropstenNodeUrl, rinkebyNodeUrl, privateKey } = require('./secrets.json');
 
 /**
  * @type import('hardhat/config').HardhatUserConfig
@@ -10,13 +10,13 @@ const { ropstenNodeUrl, rinkebyNodeUrl, privateKey } = require('./secrets.json')
 module.exports = {
   solidity: "0.7.3",
   networks: {
-    ropsten: {
-      url: ropstenNodeUrl,
-      accounts: [`0x${privateKey}`]
-    },
-    rinkeby: {
-      url: rinkebyNodeUrl,
-      accounts: [`0x${privateKey}`]
-    }
+    // ropsten: {
+    //   url: ropstenNodeUrl,
+    //   accounts: [`0x${privateKey}`]
+    // },
+    // rinkeby: {
+    //   url: rinkebyNodeUrl,
+    //   accounts: [`0x${privateKey}`]
+    // }
   }
 };
