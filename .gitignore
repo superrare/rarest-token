@@ -1,10 +1,14 @@
 # Dependencies
 .psci_modules
 bower_components
-node_modules
+node_modules/
+artifacts/
+cache/
 
 # Generated files
 .psci
 output
 
 secrets.json
+.openzeppelin
+.DS_Store
