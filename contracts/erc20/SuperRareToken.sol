@@ -1,6 +1,6 @@
 // contracts/erc20/SuperRareToken.sol
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.7.3;
+pragma solidity 0.7.3;
 
 import "@openzeppelin/contracts-upgradeable/presets/ERC20PresetMinterPauserUpgradeable.sol";
 import "../InitializableV2.sol";
@@ -38,6 +38,8 @@ contract SuperRareToken is InitializableV2,
 
         // Initialize call makes token pausable & gives pauserRole to owner
         // ERC20PausableUpgradeable.initialize(owner);
+
+        require(_owner != address(0), "Owner cant be 0 address.");
 
         // Initialize call makes token mintable & gives minterRole to msg.sender
         ERC20PresetMinterPauserUpgradeable.initialize(NAME, SYMBOL);
