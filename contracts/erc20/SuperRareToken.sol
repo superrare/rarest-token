@@ -1,6 +1,6 @@
 // contracts/erc20/SuperRareToken.sol
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.7.3;
+pragma solidity 0.7.3;
 
 import "@openzeppelin/contracts-upgradeable/presets/ERC20PresetMinterPauserUpgradeable.sol";
 import "../InitializableV2.sol";
