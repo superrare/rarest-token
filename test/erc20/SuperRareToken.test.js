@@ -9,14 +9,21 @@ describe('SuperRareToken', function () {
   });
 
   beforeEach(async function () {
-    const [owner] = await ethers.getSigners();
-
     this.superRareToken = await this.SuperRareToken.deploy();
     await this.superRareToken.deployed();
-    await this.superRareToken.init(owner.address);
+  });
+
+  it('Token init - fail', async function () {
+    await expectRevert(
+      this.superRareToken.init(ethers.constants.AddressZero),
+      "Owner cant be 0 address."
+    )
   });
 
   it('Token Properties Setup Correctly', async function () {
+    const [owner] = await ethers.getSigners();
+    await this.superRareToken.init(owner.address);
+
     expect((await this.superRareToken.symbol())).to.equal('SR');
     expect((await this.superRareToken.name())).to.equal('SuperRare');
     expect((await this.superRareToken.totalSupply())).to.equal('1000000000000000000000000');
@@ -24,6 +31,7 @@ describe('SuperRareToken', function () {
 
   it('Token Roles Setup Correctly', async function () {
     const [owner, addr1] = await ethers.getSigners();
+    await this.superRareToken.init(owner.address);
     const adminRole = await this.superRareToken.DEFAULT_ADMIN_ROLE();
     const minterRole = await this.superRareToken.MINTER_ROLE();
     const pauserRole = await this.superRareToken.PAUSER_ROLE();
@@ -39,6 +47,7 @@ describe('SuperRareToken', function () {
 
   it('Token Minting Functionality', async function () {
     const [owner, addr1] = await ethers.getSigners();
+    await this.superRareToken.init(owner.address);
     const newMint = '20000000000000000000000';
     const minterRole = await this.superRareToken.MINTER_ROLE();
 
@@ -56,6 +65,7 @@ describe('SuperRareToken', function () {
 
   it('Token Pausing Functionality', async function () {
     const [owner, addr1] = await ethers.getSigners();
+    await this.superRareToken.init(owner.address);
     const amnt = '20000000000000000000000';
     const pauserRole = await this.superRareToken.PAUSER_ROLE();
 

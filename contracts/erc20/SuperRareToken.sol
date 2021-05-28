@@ -39,6 +39,8 @@ contract SuperRareToken is InitializableV2,
         // Initialize call makes token pausable & gives pauserRole to owner
         // ERC20PausableUpgradeable.initialize(owner);
 
+        require(_owner != address(0), "Owner cant be 0 address.");
+
         // Initialize call makes token mintable & gives minterRole to msg.sender
         ERC20PresetMinterPauserUpgradeable.initialize(NAME, SYMBOL);
 
