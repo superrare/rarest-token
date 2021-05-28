@@ -41,8 +41,8 @@ contract SuperRareStaking is
         uint256[] memory _rates
     ) public initializer {
         require(
-            _tokenAddress != address(0), 
-            "initializer:tokenAddress cant be 0"    
+            _tokenAddress != address(0),
+            "initializer:tokenAddress cant be 0"
         );
         require(
             _poolAddress != address(0),
@@ -87,9 +87,7 @@ contract SuperRareStaking is
             "stake:Pool does not have enough liquidity."
         );
 
-        Stake memory newStake = Stake(amount, length, block.timestamp, reward);
-
-        stakes[msg.sender].push(newStake);
+        stakes[msg.sender].push(Stake(amount, length, block.timestamp, reward));
         totalStakeBalances[msg.sender] = totalStakeBalances[msg.sender].add(
             amount
         );
