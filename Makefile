@@ -5,8 +5,7 @@ clean: ## clean stack
 	stack clean
 	npx hardhat clean
 	rm -rf node_modules \
-		artifacts/* \
-		contracts/abis/*
+		artifacts/* 
 
 init: ## install node files
 	npm install
