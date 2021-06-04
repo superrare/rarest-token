@@ -12,9 +12,8 @@ init: ## install node files
 	npm install
 
 compile-contracts: ## compiles contracts 
-	make init
 	npx hardhat compile
-	rsync -avm --exclude='*.dbg.json' --include='*.json' -f 'hide,! */' artifacts/contracts contracts/abis
+	find artifacts/contracts -iname "*.json" ! -path "*.dbg.json" -exec cp {} contracts/abis \;
 
 hs-build: ## Build haskell bindings
 	make compile-contracts

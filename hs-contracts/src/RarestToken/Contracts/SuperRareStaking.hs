@@ -5,8 +5,8 @@
 {-# LANGUAGE OverloadedStrings     #-}
 {-# LANGUAGE QuasiQuotes           #-}
 
-module RarestToken.Contracts.SuperRareToken where
+module RarestToken.Contracts.SuperRareStaking where
 
 import           Network.Ethereum.Contract.TH
 
-[abiFrom|contracts/abis/SuperRareToken.json|]
+[abiFrom|contracts/abis/SuperRareStaking.json|]

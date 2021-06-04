@@ -24,6 +24,7 @@ source-repository head
 
 library
   exposed-modules:
+      RarestToken.Contracts.SuperRareStaking
       RarestToken.Contracts.SuperRareToken
   other-modules:
       Paths_rarest_token
