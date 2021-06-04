@@ -1,0 +1,73 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.34.4.
+--
+-- see: https://github.com/sol/hpack
+
+name:           rarest-token
+version:        0.1.0.0
+category:       Web
+homepage:       https://github.com/Pixura/rarest-token#readme
+bug-reports:    https://github.com/Pixura/rarest-token/issues
+author:         Zach Kolodny
+maintainer:     zachary@superrare.com
+copyright:      SuperRare
+license:        BSD3
+build-type:     Simple
+extra-source-files:
+    README.md
+data-dir:       contracts/
+
+source-repository head
+  type: git
+  location: https://github.com/Pixura/rarest-token
+
+library
+  exposed-modules:
+      RarestToken.Contracts.SuperRareToken
+  other-modules:
+      Paths_rarest_token
+  hs-source-dirs:
+      hs-contracts/src
+  default-extensions:
+      ApplicativeDo
+      BangPatterns
+      ConstraintKinds
+      DataKinds
+      DefaultSignatures
+      DeriveFoldable
+      DeriveFunctor
+      DeriveGeneric
+      DeriveLift
+      DeriveTraversable
+      DerivingStrategies
+      EmptyCase
+      ExistentialQuantification
+      FlexibleContexts
+      FlexibleInstances
+      FunctionalDependencies
+      GADTs
+      GeneralizedNewtypeDeriving
+      InstanceSigs
+      KindSignatures
+      LambdaCase
+      MultiParamTypeClasses
+      MultiWayIf
+      NamedFieldPuns
+      OverloadedStrings
+      PatternSynonyms
+      RankNTypes
+      RecordWildCards
+      ScopedTypeVariables
+      StandaloneDeriving
+      TupleSections
+      TypeApplications
+      TypeFamilies
+      TypeFamilyDependencies
+      TypeOperators
+  ghc-options: -Wall -Werror
+  build-depends:
+      base >=4.7 && <5
+    , generics-sop
+    , web3
+  default-language: Haskell2010

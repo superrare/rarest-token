@@ -9,4 +9,4 @@ module RarestToken.Contracts.SuperRareToken where
 
 import           Network.Ethereum.Contract.TH
 
-[abiFrom|contracts/abis/SuperRareToken.json|]
+[abiFrom|contracts/abis/contracts/erc20/SuperRareToken.sol/SuperRareToken.json|]

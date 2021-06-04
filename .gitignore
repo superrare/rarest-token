@@ -12,3 +12,5 @@ output
 secrets.json
 .openzeppelin
 .DS_Store
+
+.stack-work

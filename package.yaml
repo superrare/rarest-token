@@ -1,0 +1,54 @@
+name: rarest-token
+version: "0.1.0.0"
+category: Web
+author: Zach Kolodny
+maintainer: zachary@superrare.com
+copyright: SuperRare
+license: BSD3
+github: Pixura/rarest-token
+data-dir: contracts/
+extra-source-files:
+  - README.md
+default-extensions:
+  - ApplicativeDo
+  - BangPatterns
+  - ConstraintKinds
+  - DataKinds
+  - DefaultSignatures
+  - DeriveFoldable
+  - DeriveFunctor
+  - DeriveGeneric
+  - DeriveLift
+  - DeriveTraversable
+  - DerivingStrategies
+  - EmptyCase
+  - ExistentialQuantification
+  - FlexibleContexts
+  - FlexibleInstances
+  - FunctionalDependencies
+  - GADTs
+  - GeneralizedNewtypeDeriving
+  - InstanceSigs
+  - KindSignatures
+  - LambdaCase
+  - MultiParamTypeClasses
+  - MultiWayIf
+  - NamedFieldPuns
+  - OverloadedStrings
+  - PatternSynonyms
+  - RankNTypes
+  - RecordWildCards
+  - ScopedTypeVariables
+  - StandaloneDeriving
+  - TupleSections
+  - TypeApplications
+  - TypeFamilies
+  - TypeFamilyDependencies
+  - TypeOperators
+dependencies:
+  - base >=4.7 && <5
+  - generics-sop
+  - web3
+library:
+  source-dirs: hs-contracts/src
+  ghc-options: -Wall -Werror
