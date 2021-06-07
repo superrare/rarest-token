@@ -26,6 +26,7 @@ library
   exposed-modules:
       RarestToken.Contracts.SuperRareStaking
       RarestToken.Contracts.SuperRareToken
+      RarestToken.Contracts.SuperRareTokenMerkleDrop
   other-modules:
       Paths_rarest_token
   hs-source-dirs:
