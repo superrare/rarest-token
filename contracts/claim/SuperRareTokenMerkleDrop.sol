@@ -5,6 +5,8 @@ pragma solidity 0.7.3;
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
 
+import "hardhat/console.sol";
+
 contract SuperRareTokenMerkleDrop is ContextUpgradeable {
   address owner;
   bytes32 public claimRoot;
@@ -25,7 +27,7 @@ contract SuperRareTokenMerkleDrop is ContextUpgradeable {
     claimRoot = merkleRoot;
   }
 
-    function claim(uint256 amount, bytes32[] memory proof) public {
+    function claim(uint256 amount, bytes32[] calldata proof) public {
         require(verifyEntitled(_msgSender(), amount, proof), "The proof could not be verified.");
         require(!rewardClaimed[_msgSender()], "You have already withdrawn your entitled token.");
 
@@ -45,7 +47,7 @@ contract SuperRareTokenMerkleDrop is ContextUpgradeable {
     function verifyProof(bytes32 leaf, bytes32[] memory proof) internal view returns (bool) {
         bytes32 currentHash = leaf;
 
-        for (uint i = 0; i < proof.length; i += 1) {
+        for (uint256 i = 0; i < proof.length; i++) {
             currentHash = parentHash(currentHash, proof[i]);
         }
 
@@ -53,7 +55,7 @@ contract SuperRareTokenMerkleDrop is ContextUpgradeable {
     }
 
     function parentHash(bytes32 a, bytes32 b) internal pure returns (bytes32) {
-        return a < b ? keccak256(abi.encode(a, b)) : keccak256(abi.encode(b, a));
+        return a <= b ? keccak256(abi.encodePacked(a, b)) : keccak256(abi.encodePacked(b, a));
     }
 
     function updateMerkleRoot(bytes32 newRoot) external {

@@ -27,10 +27,14 @@
     "chai": "^4.3.3",
     "ethereum-waffle": "^3.3.0",
     "ethers": "^5.0.32",
-    "hardhat": "^2.1.0"
+    "hardhat": "^2.1.0",
+    "keccak256": "^1.0.2"
   },
   "dependencies": {
+    "csv-parser": "^3.0.0",
     "ethereumjs-util": "^6.2.1",
+    "fs": "^0.0.1-security",
+    "merkletreejs": "^0.2.18",
     "solc": "^0.7.3"
   }
 }
