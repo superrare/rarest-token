@@ -12,7 +12,8 @@ contract SuperRareTokenMerkleDrop is ContextUpgradeable {
   mapping (address => bool) public rewardClaimed;
 
   event TokensClaimed(
-    address addr,
+    bytes32 indexed root,
+    address indexed addr,
     uint256 amt
   );
 
@@ -31,7 +32,7 @@ contract SuperRareTokenMerkleDrop is ContextUpgradeable {
         rewardClaimed[_msgSender()] = true;
 
         require(token.transfer(_msgSender(), amount));
-        emit TokensClaimed(_msgSender(), amount);
+        emit TokensClaimed(claimRoot, _msgSender(), amount);
     }
 
     function verifyEntitled(address recipient, uint value, bytes32[] memory proof) public view returns (bool) {
