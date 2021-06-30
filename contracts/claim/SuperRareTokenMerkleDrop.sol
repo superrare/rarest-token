@@ -6,32 +6,33 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
 
 contract SuperRareTokenMerkleDrop is ContextUpgradeable {
-  address _owner;
-  bytes32 public _merkleRoot;
-  IERC20Upgradeable _superRareToken;
-  mapping (address => bool) public _claimed;
+  address owner;
+  bytes32 public claimRoot;
+  IERC20Upgradeable token;
+  mapping (address => bool) public rewardClaimed;
 
   event TokensClaimed(
-    address addr,
+    bytes32 indexed root,
+    address indexed addr,
     uint256 amt
   );
 
   constructor(address superRareToken, bytes32 merkleRoot) {
     require(superRareToken != address(0), "Token address cant be 0 address.");
     require(merkleRoot != bytes32(0), "MerkleRoot cant be empty.");
-    _owner = _msgSender();
-    _superRareToken = IERC20Upgradeable(superRareToken);
-    _merkleRoot = merkleRoot;
+    owner = _msgSender();
+    token = IERC20Upgradeable(superRareToken);
+    claimRoot = merkleRoot;
   }
 
     function claim(uint256 amount, bytes32[] memory proof) public {
         require(verifyEntitled(_msgSender(), amount, proof), "The proof could not be verified.");
-        require(!_claimed[_msgSender()], "You have already withdrawn your entitled token.");
+        require(!rewardClaimed[_msgSender()], "You have already withdrawn your entitled token.");
 
-        _claimed[_msgSender()] = true;
+        rewardClaimed[_msgSender()] = true;
 
-        require(_superRareToken.transfer(_msgSender(), amount));
-        emit TokensClaimed(_msgSender(), amount);
+        require(token.transfer(_msgSender(), amount));
+        emit TokensClaimed(claimRoot, _msgSender(), amount);
     }
 
     function verifyEntitled(address recipient, uint value, bytes32[] memory proof) public view returns (bool) {
@@ -48,7 +49,7 @@ contract SuperRareTokenMerkleDrop is ContextUpgradeable {
             currentHash = parentHash(currentHash, proof[i]);
         }
 
-        return currentHash == _merkleRoot;
+        return currentHash == claimRoot;
     }
 
     function parentHash(bytes32 a, bytes32 b) internal pure returns (bytes32) {
@@ -56,7 +57,7 @@ contract SuperRareTokenMerkleDrop is ContextUpgradeable {
     }
 
     function updateMerkleRoot(bytes32 newRoot) external {
-        require (_msgSender() == _owner, "Must be owner of the contract.");
-        _merkleRoot = newRoot;
+        require (_msgSender() == owner, "Must be owner of the contract.");
+        claimRoot = newRoot;
     }
 }
