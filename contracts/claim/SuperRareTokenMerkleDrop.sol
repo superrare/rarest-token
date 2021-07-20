@@ -65,6 +65,13 @@ contract SuperRareTokenMerkleDrop is ContextUpgradeable {
 
     function updateTokenAddress(address _token) external {
         require (_msgSender() == owner, "Must be owner of the contract.");
+        require(_token != address(0), "New token address cannot be the zero address");
         token = IERC20Upgradeable(_token);
+    }
+
+    function transferOwnership(address _owner) external {
+        require (_msgSender() == owner, "Must be owner of the contract.");
+        require(_owner != address(0), "New owner address cannot be the zero address");
+        owner = _owner;
     }
 }

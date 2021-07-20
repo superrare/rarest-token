@@ -1,4 +1,4 @@
-// scripts/ownership.transferOwnership.js
+// scripts/ownership.transferProxyOwnership.js
 
 const { ethers, upgrades } = require("hardhat");
 
