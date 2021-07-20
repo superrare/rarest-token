@@ -1,10 +1,10 @@
 const { ethers, upgrades } = require("hardhat");
 
 async function main() {
-  const [deployer] = await ethers.getSigners();
+  const newTokenImplAddress;
 
   const newToken = await ethers.getContractFactory("SuperRareToken");
-  const upgradedToken = await upgrades.upgradeProxy('0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0', newToken);
+  const upgradedToken = await upgrades.upgradeProxy(newTokenImplAddress, newToken);
 
   await upgradedToken.deployed();
 

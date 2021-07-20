@@ -10,7 +10,10 @@ cache/
 output
 
 secrets.json
-.openzeppelin
+.openzeppelin/unknown-*.json
 .DS_Store
 
 .stack-work
+
+coverage.json
+coverage/*

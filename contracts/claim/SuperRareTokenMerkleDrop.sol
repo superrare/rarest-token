@@ -10,7 +10,7 @@ import "hardhat/console.sol";
 contract SuperRareTokenMerkleDrop is ContextUpgradeable {
   address owner;
   bytes32 public claimRoot;
-  IERC20Upgradeable token;
+  IERC20Upgradeable public token;
   mapping (address => bool) public rewardClaimed;
 
   event TokensClaimed(
@@ -61,5 +61,10 @@ contract SuperRareTokenMerkleDrop is ContextUpgradeable {
     function updateMerkleRoot(bytes32 newRoot) external {
         require (_msgSender() == owner, "Must be owner of the contract.");
         claimRoot = newRoot;
+    }
+
+    function updateTokenAddress(address _token) external {
+        require (_msgSender() == owner, "Must be owner of the contract.");
+        token = IERC20Upgradeable(_token);
     }
 }
