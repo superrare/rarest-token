@@ -24,7 +24,7 @@ describe('SuperRareToken', function () {
     const [owner] = await ethers.getSigners();
     await this.superRareToken.init(owner.address);
 
-    expect((await this.superRareToken.symbol())).to.equal('SR');
+    expect((await this.superRareToken.symbol())).to.equal('RARE');
     expect((await this.superRareToken.name())).to.equal('SuperRare');
     expect((await this.superRareToken.totalSupply())).to.equal('1000000000000000000000000');
   });

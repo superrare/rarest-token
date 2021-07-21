@@ -12,7 +12,7 @@ contract SuperRareToken is InitializableV2,
 {
     string constant NAME = "SuperRare";
 
-    string constant SYMBOL = "SR";
+    string constant SYMBOL = "RARE";
 
     // Defines number of Wei in 1 token
     // 18 decimals is standard - imitates relationship between Ether and Wei

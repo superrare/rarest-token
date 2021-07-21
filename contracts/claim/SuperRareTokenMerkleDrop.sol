@@ -4,13 +4,13 @@ pragma solidity 0.7.3;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 import "hardhat/console.sol";
 
-contract SuperRareTokenMerkleDrop is ContextUpgradeable {
-  address owner;
+contract SuperRareTokenMerkleDrop is ContextUpgradeable, OwnableUpgradeable {
   bytes32 public claimRoot;
-  IERC20Upgradeable token;
+  IERC20Upgradeable public token;
   mapping (address => bool) public rewardClaimed;
 
   event TokensClaimed(
@@ -22,7 +22,7 @@ contract SuperRareTokenMerkleDrop is ContextUpgradeable {
   constructor(address superRareToken, bytes32 merkleRoot) {
     require(superRareToken != address(0), "Token address cant be 0 address.");
     require(merkleRoot != bytes32(0), "MerkleRoot cant be empty.");
-    owner = _msgSender();
+    __Ownable_init();
     token = IERC20Upgradeable(superRareToken);
     claimRoot = merkleRoot;
   }
@@ -58,8 +58,12 @@ contract SuperRareTokenMerkleDrop is ContextUpgradeable {
         return a <= b ? keccak256(abi.encodePacked(a, b)) : keccak256(abi.encodePacked(b, a));
     }
 
-    function updateMerkleRoot(bytes32 newRoot) external {
-        require (_msgSender() == owner, "Must be owner of the contract.");
+    function updateMerkleRoot(bytes32 newRoot) external onlyOwner {
         claimRoot = newRoot;
+    }
+
+    function updateTokenAddress(address _token) external onlyOwner {
+        require(_token != address(0), "New token address cannot be the zero address");
+        token = IERC20Upgradeable(_token);
     }
 }
