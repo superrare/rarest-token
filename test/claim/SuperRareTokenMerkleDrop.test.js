@@ -32,7 +32,7 @@ describe('SuperRareTokenMerkleDrop', function () {
     const newMerkleRoot = "0x1c4e89f92fcfbc3d7512bac19f1723e373feb94d6bf683c5cbfd110a0fd6e360";
     await expectRevert(
       this.superRareTokenMerkleDrop.connect(addr1).updateMerkleRoot(newMerkleRoot),
-      "Must be owner of the contract."
+      "Ownable: caller is not the owner"
     );
   });
 
