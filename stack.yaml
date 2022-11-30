@@ -1,8 +1,29 @@
-resolver: lts-14.6
+resolver:
+  url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/nightly/2022/7/28.yaml
+
+allow-newer: true
 
 packages:
   - "."
 
 extra-deps:
-  - git: https://github.com/charlescrain/hs-web3
-    commit: 45c374cc489f25394527272cd1df911ecd6440a4
+  - git: git@github.com:superrare/hs-web3.git
+    commit: ac45f1fe34c2290739dcb7603a075c55385c2a51
+    subdirs:
+      - packages/bignum
+      - packages/crypto
+      - packages/ethereum
+      - packages/hexstring
+      - packages/ipfs
+      - packages/jsonrpc
+      - packages/polkadot
+      - packages/provider
+      - packages/scale
+      - packages/solidity
+      - packages/web3
+  - relapse-1.0.0.0@sha256:b89ea23189e07f377be4e2a4deccf3d6ba7f547ed8ad77e27b35d78801efd81c
+  - protolude-0.3.2
+  - animalcase-0.1.0.2@sha256:d7b80c3130c68d7ce8ddd9782588b2c4dd7da86461f302c54cc4acddf0902b51,1015
+  - extensible-0.9@sha256:a93b7e55ccf0407915a2a60944b73577c50377f75de2c28d5a3acac96d231fcd,3344
+  - incremental-0.3.1@sha256:9c697bae4f7e5ceb144bde13e03ca2f36b4bc2d0c92bbc02e0a604231ee279c2,1153
+  - membership-0.0.1@sha256:6c4d4ab6e3fb3253c6c670e8a63f74454dc91be50b9f292d0b1355792190aee5,999
