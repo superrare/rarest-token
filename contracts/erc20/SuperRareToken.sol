@@ -18,8 +18,9 @@ contract SuperRareToken is InitializableV2,
     // 18 decimals is standard - imitates relationship between Ether and Wei
     uint8 constant DECIMALS = 18;
 
-    // 10^27 = 1 billion tokens with 18 decimal places.
-    uint256 constant INITIAL_SUPPLY = 1000000000 * 10**uint256(DECIMALS);
+    // 10^27 = 1 million (10^6) tokens, 18 decimal places
+    // 1 TAUD = 1 * 10^18 wei
+    uint256 constant INITIAL_SUPPLY = 1000000 * 10**uint256(DECIMALS);
 
     // for ERC20 approve transactions in compliance with EIP 2612:
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2612.md
@@ -64,7 +65,6 @@ contract SuperRareToken is InitializableV2,
             )
         );
     }
-
 
     function permit(
         address owner,

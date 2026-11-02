@@ -36,7 +36,7 @@ contract SuperRareTokenRecoveryForkTest {
             initData
         );
         SuperRareTokenV2 token = SuperRareTokenV2(address(proxy));
-        require(token.totalSupply() == 1000000000000000000000000000, "incorrect initialized supply");
+        require(token.totalSupply() == 1000000000000000000000000, "incorrect initialized supply");
     }
 
     function testSafeUpgradeRecoversOnlyNewtHeldRareWithoutChangingSupply() external {
