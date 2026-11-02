@@ -4,6 +4,11 @@ bower_components
 node_modules/
 artifacts/
 cache/
+out/
+broadcast/
+.env
+.env.*
+!.env.example
 
 # Generated files
 .psci

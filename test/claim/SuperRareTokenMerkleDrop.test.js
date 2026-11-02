@@ -88,6 +88,6 @@ describe('SuperRareTokenMerkleDrop', function () {
     await merkleDrop.claim(10000, proof);
 
     expect((await this.superRareToken.balanceOf(merkleDrop.address)).toString()).to.equal('90000');
-    expect((await this.superRareToken.balanceOf(owner.address)).toString()).to.equal('999999999999999999910000');
+    expect((await this.superRareToken.balanceOf(owner.address)).toString()).to.equal('999999999999999999999910000');
   });
 });

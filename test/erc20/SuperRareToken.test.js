@@ -26,7 +26,7 @@ describe('SuperRareToken', function () {
 
     expect((await this.superRareToken.symbol())).to.equal('RARE');
     expect((await this.superRareToken.name())).to.equal('SuperRare');
-    expect((await this.superRareToken.totalSupply())).to.equal('1000000000000000000000000');
+    expect((await this.superRareToken.totalSupply())).to.equal('1000000000000000000000000000');
   });
 
   it('Token Roles Setup Correctly', async function () {
